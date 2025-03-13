@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Character Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .question { font-size: 50px; font-weight: bold; margin: 20px 0; }
+        .correct { color: green; animation: fadeIn 1s; font-size: 60px; }
+        .wrong { color: red; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #answerInput { font-size: 20px; padding: 10px; width: 200px; }
+        button { font-size: 18px; padding: 10px 20px; margin-left: 10px; cursor: pointer; }
+        .score { margin-top: 20px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>Japanese Character Quiz</h1>
+    <div>
+        <label><input type="radio" name="mode" value="hiragana" checked> Hiragana</label>
+        <label><input type="radio" name="mode" value="katakana"> Katakana</label>
+        <label><input type="radio" name="mode" value="both"> Both</label>
+        <label><input type="radio" name="mode" value="mix"> Mix</label>
+    </div>
+    <p class="question" id="charDisplay">?</p>
+    <input type="text" id="answerInput" placeholder="Enter Romaji">
+    <button onclick="checkAnswer()">Submit</button>
+    <p id="result"></p>
+    <p class="score">Score: <span id="score">0</span></p>
+    
+    <script>
+        const characters = [
+            { Hiragana: 'あ', Katakana: 'ア', Romaji: 'a' },
+            { Hiragana: 'い', Katakana: 'イ', Romaji: 'i' },
+            { Hiragana: 'う', Katakana: 'ウ', Romaji: 'u' },
+            { Hiragana: 'え', Katakana: 'エ', Romaji: 'e' },
+            { Hiragana: 'お', Katakana: 'オ', Romaji: 'o' },
+            { Hiragana: 'か', Katakana: 'カ', Romaji: 'ka' },
+            { Hiragana: 'き', Katakana: 'キ', Romaji: 'ki' },
+            { Hiragana: 'く', Katakana: 'ク', Romaji: 'ku' },
+            { Hiragana: 'け', Katakana: 'ケ', Romaji: 'ke' },
+            { Hiragana: 'こ', Katakana: 'コ', Romaji: 'ko' }
+        ];
+        
+        let currentChar = {};
+        let score = 0;
+        
+        function getRandomChar() {
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            const selectedChar = characters[randomIndex];
+
+            if (mode === 'hiragana') {
+                currentChar = { display: selectedChar.Hiragana, romaji: selectedChar.Romaji };
+            } 
+            else if (mode === 'katakana') {
+                currentChar = { display: selectedChar.Katakana, romaji: selectedChar.Romaji };
+            } 
+            else if (mode === 'both') {
+                currentChar = { display: `${selectedChar.Hiragana} / ${selectedChar.Katakana}`, romaji: selectedChar.Romaji };
+            } 
+            else if (mode === 'mix') {
+                const randomType = Math.random() < 0.5 ? 'Hiragana' : 'Katakana';
+                currentChar = { display: selectedChar[randomType], romaji: selectedChar.Romaji };
+            }
+
+            document.getElementById('charDisplay').innerText = currentChar.display;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('result').innerText = '';
+            document.getElementById('answerInput').focus();
+        }
+        
+        function checkAnswer() {
+            const input = document.getElementById('answerInput').value.trim().toLowerCase();
+            if (input === currentChar.romaji) {
+                document.getElementById('result').innerText = 'Correct!';
+                document.getElementById('result').className = 'correct';
+                score++;
+                document.getElementById('score').innerText = score;
+                setTimeout(getRandomChar, 1000);
+            } else {
+                document.getElementById('result').innerText = 'Wrong, try again!';
+                document.getElementById('result').className = 'wrong';
+            }
+        }
+        
+        document.getElementById('answerInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') checkAnswer();
+            else if (event.key === 'ArrowRight') getRandomChar();
+        });
+        
+        document.querySelectorAll('input[name="mode"]').forEach(input => {
+            input.addEventListener('change', getRandomChar);
+        });
+        
+        getRandomChar();
+    </script>
+</body>
+</html>
